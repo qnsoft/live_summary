@@ -7,7 +7,7 @@
 ## 默认配置
 
 ```toml
-[Summary]
+[LiveSummary]
 SampleRate = 1
 ```
 - SampleRate 采样率，单位秒，即每一秒采样一次
