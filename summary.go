@@ -21,7 +21,7 @@ var config = struct {
 
 func init() {
 	plugin := &PluginConfig{
-		Name:   "Summary",
+		Name:   "LiveSummary",
 		Config: &config,
 		Run:    Summary.StartSummary,
 	}
