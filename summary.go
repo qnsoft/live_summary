@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	. "github.com/qnsoft/live_sdk"
-	. "github.com/qnsoft/live_utils"
+	"github.com/qnsoft/live_sdk"
+	"github.com/qnsoft/live_utils"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
@@ -20,17 +20,17 @@ var config = struct {
 }{1}
 
 func init() {
-	plugin := &PluginConfig{
+	plugin := &live_sdk.PluginConfig{
 		Name:   "LiveSummary",
 		Config: &config,
 		Run:    Summary.StartSummary,
 	}
-	InstallPlugin(plugin)
+	live_sdk.InstallPlugin(plugin)
 	http.HandleFunc("/api/summary", summary)
 }
 func summary(w http.ResponseWriter, r *http.Request) {
-	CORS(w, r)
-	sse := NewSSE(w, r.Context())
+	live_utils.CORS(w, r)
+	sse := live_utils.NewSSE(w, r.Context())
 	Summary.Add()
 	defer Summary.Done()
 	sse.WriteJSON(&Summary)
@@ -66,7 +66,7 @@ type ServerSummary struct {
 		Usage float64
 	}
 	NetWork     []NetWorkInfo
-	Streams     []*Stream
+	Streams     []*live_sdk.Stream
 	lastNetWork []NetWorkInfo
 	ref         int
 	control     chan bool
@@ -98,13 +98,13 @@ func (s *ServerSummary) StartSummary() {
 			if v {
 				if s.ref++; s.ref == 1 {
 					log.Println("start report summary")
-					TriggerHook("Summary", true)
+					live_sdk.TriggerHook("Summary", true)
 				}
 			} else {
 				if s.ref--; s.ref == 0 {
 					s.lastNetWork = nil
 					log.Println("stop report summary")
-					TriggerHook("Summary", false)
+					live_sdk.TriggerHook("Summary", false)
 				}
 			}
 		case report := <-s.reportChan:
@@ -181,6 +181,6 @@ func (s *ServerSummary) collect() {
 	//fmt.Printf("        HD        : %v GB  Free: %v GB Usage:%f%%\n", d.Total/1024/1024/1024, d.Free/1024/1024/1024, d.UsedPercent)
 	//fmt.Printf("        OS        : %v(%v)   %v  \n", n.Platform, n.PlatformFamily, n.PlatformVersion)
 	//fmt.Printf("        Hostname  : %v  \n", n.Hostname)
-	s.Streams = Streams.ToList()
+	s.Streams = live_sdk.Streams.ToList()
 	return
 }
