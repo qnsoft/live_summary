@@ -1,4 +1,4 @@
-package plugin_summary
+package live_summary
 
 import (
 	"log"
